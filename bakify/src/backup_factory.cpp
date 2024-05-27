@@ -18,4 +18,14 @@
 
 #include "include/backup_factory.hpp"
 
-void StartBackingUp() {}
+#include <queue>
+#include <string>
+#include <vector>
+
+namespace {
+std::queue<std::string> files{};
+}
+
+void StartBackingUp(std::vector<std::string>&& file_names) {
+  files = std::queue<std::string>{file_names.cbegin(), file_names.cend()};
+}
