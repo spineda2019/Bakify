@@ -20,6 +20,7 @@
 #include <exception>
 #include <iostream>
 #include <ostream>
+#include <vector>
 
 constexpr const char *version{"0.0.1"};
 
@@ -34,6 +35,10 @@ int main(int argc, char **argv) {
   argument_parser.add_argument("-v", "--version")
       .flag()
       .help("Display version and copyright information");
+
+  argument_parser.add_argument("files")
+      .nargs(argparse::nargs_pattern::any)
+      .help("Files to create backups for");
 
   try {
     argument_parser.parse_args(argc, argv);
@@ -60,6 +65,8 @@ int main(int argc, char **argv) {
         << std::endl;
     return 0;
   }
+
+  auto files = argument_parser.get<std::vector<std::string>>("files");
 
   return 0;
 }
