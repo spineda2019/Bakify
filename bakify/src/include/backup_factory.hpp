@@ -19,6 +19,9 @@
 #ifndef BAKIFY_SRC_INCLUDE_BACKIFY_FACTORY_HPP_
 #define BAKIFY_SRC_INCLUDE_BACKIFY_FACTORY_HPP_
 
-void StartBackingUp();
+#include <string>
+#include <vector>
+
+void StartBackingUp(std::vector<std::string>&& file_names);
 
 #endif  // BAKIFY_SRC_INCLUDE_BACKIFY_FACTORY_HPP_
