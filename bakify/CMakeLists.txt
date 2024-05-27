@@ -1,5 +1,5 @@
 # collect all source files from the src directory
-set(SOURCES "src/main.cpp")
+set(SOURCES "src/main.cpp" "src/backup_factory.cpp")
 
 # create the executable
 add_executable(${PROJECT_NAME} ${SOURCES})
