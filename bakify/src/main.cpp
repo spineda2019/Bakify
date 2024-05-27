@@ -22,6 +22,8 @@
 #include <ostream>
 #include <vector>
 
+#include "backup_factory.hpp"
+
 constexpr const char *version{"0.0.1"};
 
 int main(int argc, char **argv) {
@@ -66,7 +68,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  auto files = argument_parser.get<std::vector<std::string>>("files");
+  StartBackingUp(argument_parser.get<std::vector<std::string>>("files"));
 
   return 0;
 }
