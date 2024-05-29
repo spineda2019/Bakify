@@ -23,8 +23,11 @@
 #include <condition_variable>
 #include <cstddef>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <iterator>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <string>
 #include <thread>
@@ -37,11 +40,55 @@ std::mutex job_lock{};
 std::mutex print_lock{};
 std::condition_variable job_condition{};
 std::atomic<bool> stop_threads{false};
+constexpr std::size_t LIMIT{100};
+
+std::optional<std::ofstream> MakeBackup(
+    const std::filesystem::path&& file_to_backup) {
+  std::filesystem::path backup{
+      std::filesystem::path{file_to_backup}.concat(".bak")};
+  std::size_t attempt{1};
+
+  while (std::filesystem::exists(backup)) {
+    backup = std::filesystem::path{file_to_backup}.concat(
+        "-" + std::to_string(attempt) + ".bak");
+    attempt++;
+
+    if (attempt >= LIMIT) [[unlikely]] {
+      std::cout << "WARNING: " << file_to_backup << " has exceeded the "
+                << LIMIT << " backup limit and was not backed up as a result"
+                << std::endl;
+      return std::nullopt;
+    }
+  }
+
+  return std::ofstream{backup};
+}
 
 void BackupFile(const std::filesystem::path&& file) {
-  {
-    std::unique_lock<std::mutex> lock{print_lock};
+  if (std::unique_lock<std::mutex> lock{print_lock};
+      std::filesystem::exists(file)) [[likely]] {
     std::cout << "Backing Up: " << file << std::endl;
+  } else {
+    std::cout << "WARNING: " << file
+              << " does not seem to exist. Not backing up..." << std::endl;
+    return;
+  }
+
+  std::optional<std::ofstream> file_stream{MakeBackup(std::move(file))};
+
+  if (!file_stream.has_value()) [[unlikely]] {
+    return;
+  }
+
+  std::ifstream original_file{file};
+
+  while (!original_file.eof()) {
+    original_file.peek();
+    file_stream.value() << static_cast<char>(original_file.get());
+
+    if (original_file.peek() == std::ifstream::traits_type::eof()) {
+      return;
+    }
   }
 }
 
