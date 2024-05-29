@@ -62,7 +62,8 @@ void WaitingRoom(void) {
       paths.pop();
     }
 
-    BackupFile(std::filesystem::path{current_file_name});
+    BackupFile(std::filesystem::canonical(
+        std::filesystem::path{std::move(current_file_name)}));
   }
 }
 
