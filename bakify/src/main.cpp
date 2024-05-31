@@ -16,15 +16,15 @@
  *  with this program. If not, see <https://www.gnu.org/licenses/>
  */
 
-#include <argparse/argparse.hpp>
 #include <exception>
 #include <iostream>
 #include <ostream>
 #include <vector>
 
-#include "backup_factory.hpp"
+#include "argparse/argparse.hpp"
+#include "include/backup_factory.hpp"
 
-constexpr const char *version{"0.0.1"};
+constexpr const char *version{"1.0.0"};
 
 int main(int argc, char **argv) {
   argparse::ArgumentParser argument_parser{"Bakify", version,
