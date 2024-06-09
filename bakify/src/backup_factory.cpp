@@ -25,7 +25,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <iterator>
 #include <mutex>
 #include <optional>
 #include <queue>
@@ -116,9 +115,10 @@ void WaitingRoom(void) {
 
 }  // namespace
 
-void StartBackingUp(std::vector<std::string>&& file_names) {
+void StartBackingUp(std::vector<std::string>&& file_names,
+                    std::vector<std::string>&& collected_from_file) {
   const std::size_t cores{std::thread::hardware_concurrency()};
-  const std::size_t file_count{file_names.size()};
+  const std::size_t file_count{file_names.size() + collected_from_file.size()};
   const std::size_t thread_count = file_count > cores ? cores : file_count;
 
   std::vector<std::jthread> jobs{};
@@ -129,6 +129,14 @@ void StartBackingUp(std::vector<std::string>&& file_names) {
   }
 
   std::ranges::for_each(file_names, [](const std::string& file) {
+    {
+      std::unique_lock<std::mutex> lock{job_lock};
+      paths.emplace(std::move(file));
+    }
+    job_condition.notify_one();
+  });
+
+  std::ranges::for_each(collected_from_file, [](const std::string& file) {
     {
       std::unique_lock<std::mutex> lock{job_lock};
       paths.emplace(std::move(file));

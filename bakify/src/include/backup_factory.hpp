@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
-void StartBackingUp(std::vector<std::string>&& file_names);
+void StartBackingUp(std::vector<std::string>&& file_names,
+                    std::vector<std::string>&& collected_from_file);
 
 #endif  // BAKIFY_SRC_INCLUDE_BACKIFY_FACTORY_HPP_
