@@ -29,7 +29,7 @@
 
 #include "backup_factory.hpp"
 
-constexpr const char *version{"0.0.1"};
+constexpr const char *version{"1.0.0"};
 
 std::vector<std::string> CollectFilenames(const std::string &&file_name) {
   if (!std::filesystem::exists(file_name)) {
