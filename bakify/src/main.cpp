@@ -16,7 +16,6 @@
  *  with this program. If not, see <https://www.gnu.org/licenses/>
  */
 
-#include <argparse/argparse.hpp>
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -27,9 +26,11 @@
 #include <utility>
 #include <vector>
 
-#include "backup_factory.hpp"
+#include "argparse/argparse.hpp"
+#include "include/backup_factory.hpp"
 
 constexpr const char *version{"1.0.0"};
+<<<<<<< HEAD
 
 std::vector<std::string> CollectFilenames(const std::string &&file_name) {
   if (!std::filesystem::exists(file_name)) {
@@ -48,6 +49,8 @@ std::vector<std::string> CollectFilenames(const std::string &&file_name) {
     return files;
   }
 }
+=======
+>>>>>>> refs/remotes/origin/main
 
 int main(int argc, char **argv) {
   argparse::ArgumentParser argument_parser{"Bakify", version,
