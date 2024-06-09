@@ -18,13 +18,36 @@
 
 #include <argparse/argparse.hpp>
 #include <exception>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <optional>
 #include <ostream>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "backup_factory.hpp"
 
 constexpr const char *version{"0.0.1"};
+
+std::vector<std::string> CollectFilenames(const std::string &&file_name) {
+  if (!std::filesystem::exists(file_name)) {
+    std::cerr << "WARNING: " << file_name << " for -f could not be found!"
+              << std::endl;
+    return std::vector<std::string>{};
+  } else {
+    std::ifstream list_file{file_name};
+    std::vector<std::string> files{};
+    std::string line{};
+
+    while (std::getline(list_file, line)) {
+      files.emplace_back(line);
+    }
+
+    return files;
+  }
+}
 
 int main(int argc, char **argv) {
   argparse::ArgumentParser argument_parser{"Bakify", version,
@@ -37,6 +60,9 @@ int main(int argc, char **argv) {
   argument_parser.add_argument("-v", "--version")
       .flag()
       .help("Display version and copyright information");
+
+  argument_parser.add_argument("-f", "--file")
+      .help("Specify backing up files from a list on disk");
 
   argument_parser.add_argument("files")
       .nargs(argparse::nargs_pattern::any)
@@ -68,7 +94,14 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  StartBackingUp(argument_parser.get<std::vector<std::string>>("files"));
+  const std::optional<std::string> file_name{argument_parser.present("file")};
+  if (file_name.has_value()) {
+    StartBackingUp(argument_parser.get<std::vector<std::string>>("files"),
+                   CollectFilenames(std::move(file_name.value())));
+  } else {
+    StartBackingUp(argument_parser.get<std::vector<std::string>>("files"),
+                   std::vector<std::string>{});
+  }
 
   return 0;
 }
